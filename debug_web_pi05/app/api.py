@@ -60,6 +60,9 @@ def dispatch(method,path,query_string,body):
             if path=='/api/weights/cancel' and method=='POST': return reply(weights.status((body or {}).get('id'),cancel=True))
             if path=='/api/weights/tensor' and method=='POST': return reply(weights.heatmap(body or {}))
             return Error('接口不存在',404)
+        if path=='/api/checkpoint-state' and method=='POST':
+            from .checkpoint_state import inspect
+            return reply(inspect((body or {}).get('path','')))
         if path=='/api/ping': return reply({'ok':True,'web_build':web_build()})
         if path=='/api/config':
             if method=='GET': return reply(settings.all())
