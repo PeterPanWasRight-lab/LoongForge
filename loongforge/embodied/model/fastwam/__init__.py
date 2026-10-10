@@ -1,1 +1,0 @@
-"""FastWAM model adapter package."""

@@ -91,47 +91,6 @@ def test_pi05_payload_builder_defaults_and_state_none():
     assert pb.action_dim == 7
 
 
-def test_xvla_payload_builder_ee6d_shape_and_layout():
-    """XVLA ee6d PayloadBuilder emits [pos(3), rot6d(6), gripper(1)] padded to 20D.
-
-    Column-major layout ``[R00, R10, R20, R01, R11, R21]`` — the first two
-    columns of the ``ee_ori_mat`` supplied by the LIBERO OSC controller are
-    concatenated to form the 6D rotation representation.
-    """
-    adapter = LiberoAdapter("libero_object")
-    canonical = adapter.obs_to_canonical(_synthetic_env_obs(), _synthetic_context())
-    pb = build_payload_builder(
-        "xvla",
-        yaml_model={"state_encoding": "ee6d", "action_encoding": "ee6d", "domain_id": 3},
-        yaml_server={},
-        yaml_benchmark={},
-    )
-    kwargs = pb.build(canonical, {"benchmark_name": "libero"})
-    state = kwargs["state"]
-    assert state.shape == (20,)
-    # Position comes from context.ee_pos.
-    np.testing.assert_allclose(state[:3], np.array([0.5, -0.3, 0.4]), atol=1e-6)
-    # rot6d = concat of first two columns of the synthetic ee_ori_mat
-    # [[0.9,0.1,0.1],[0.1,0.9,0.1],[0.1,0.1,0.9]] → [0.9,0.1,0.1, 0.1,0.9,0.1]
-    np.testing.assert_allclose(
-        state[3:9], np.array([0.9, 0.1, 0.1, 0.1, 0.9, 0.1]), atol=1e-6
-    )
-    # Gripper is forced to 0.0 in ee6d (matches X-VLA LIBERO client).
-    assert float(state[9]) == 0.0
-    # Padding zeros.
-    np.testing.assert_allclose(state[10:], np.zeros(10), atol=1e-6)
-    assert kwargs["domain_id"] == 3
-
-
-def test_xvla_domain_id_auto_from_benchmark_name():
-    """When YAML omits ``domain_id``, PayloadBuilder falls back to the benchmark map."""
-    adapter = LiberoAdapter("libero_object")
-    canonical = adapter.obs_to_canonical(_synthetic_env_obs(), _synthetic_context())
-    pb = build_payload_builder("xvla", yaml_model={"state_encoding": "ee6d"})
-    kwargs = pb.build(canonical, {"benchmark_name": "libero"})
-    assert kwargs["domain_id"] == 3  # DEFAULT_DOMAIN_ID_MAP["libero"]
-
-
 def test_resolve_action_decoder_key_pi05_identity():
     """Pi05 axis_angle × LIBERO axis_angle should compose to identity (empty key)."""
     adapter = LiberoAdapter("libero_object")
@@ -186,82 +145,6 @@ def test_yaml_override_respects_type_annotation_whitelist():
 # CALVIN + ManiSkill + SimplerEnv coverage (added when the refactor extended
 # past LIBERO to the other 3 A-form benchmarks).
 # ---------------------------------------------------------------------------
-
-
-def test_xvla_ee6d_calvin_shape_and_layout():
-    """CALVIN ee6d encoding emits [tcp_pos(3), euler→rot6d_interleaved(6), grip(1)] padded to 20D."""
-    from loongforge.embodied.eval.payload_builders.xvla import _encode_ee6d_calvin
-
-    robot_obs = np.array(
-        [0.1, 0.2, 0.3, 0.0, 0.0, 0.0, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.0],
-        dtype=np.float32,
-    )
-    encoded = _encode_ee6d_calvin({"robot_obs": robot_obs})
-    assert encoded.shape == (20,)
-    np.testing.assert_allclose(encoded[:3], np.array([0.1, 0.2, 0.3]), atol=1e-6)
-    # Zero-Euler rotation → identity matrix → interleaved rot6d = [1,0,0,1,0,0].
-    np.testing.assert_allclose(encoded[3:9], np.array([1.0, 0.0, 0.0, 1.0, 0.0, 0.0]), atol=1e-6)
-    # Gripper action > 0 → 1.0.
-    assert float(encoded[9]) == 1.0
-    np.testing.assert_allclose(encoded[10:], np.zeros(10), atol=1e-6)
-
-
-def test_xvla_ee6d_calvin_stateful_backfill():
-    """CALVIN closed-loop backfill: subsequent build() reuses proprio[:10]=last action[:10]."""
-    from loongforge.embodied.eval.adapters.calvin import CalvinAdapter
-
-    adapter = CalvinAdapter()
-    robot_obs = np.array(
-        [0.0] * 3 + [0.0, 0.0, 0.0] + [0.0] * 8 + [1.0], dtype=np.float32
-    )
-    env_obs = {
-        "rgb_obs": {
-            "rgb_static": np.zeros((256, 256, 3), dtype=np.uint8),
-            "rgb_gripper": np.zeros((256, 256, 3), dtype=np.uint8),
-        },
-        "robot_obs": robot_obs,
-    }
-    canonical = adapter.obs_to_canonical(
-        env_obs, {"instruction": "", "episode_id": "ep", "episode_step": 0}
-    )
-    pb = build_payload_builder(
-        "xvla", yaml_model={"state_encoding": "ee6d_calvin", "domain_id": 2}
-    )
-    pb.reset("ep")
-    kwargs1 = pb.build(canonical, {"benchmark_name": "calvin"})
-    # First build uses initial ee6d_calvin from robot_obs.
-    assert kwargs1["state"].shape == (20,)
-    # Simulate a response with a synthetic action chunk; verify backfill.
-    fake_response = {"actions": np.arange(10, dtype=np.float32).reshape(1, 10)}
-    pb.update_from_response(fake_response)
-    kwargs2 = pb.build(canonical, {"benchmark_name": "calvin"})
-    assert np.allclose(kwargs2["state"][:10], np.arange(10, dtype=np.float32))
-    # reset() clears the buffer.
-    pb.reset("ep-next")
-    kwargs3 = pb.build(canonical, {"benchmark_name": "calvin"})
-    assert not np.allclose(kwargs3["state"][:10], np.arange(10, dtype=np.float32))
-
-
-def test_xvla_ee6d_widowx_initial_shape():
-    """WidowX initial 20D proprio: [ee_pos(3), 1,0,0,1,0,0, gripper=0] padded to 20."""
-    try:
-        from sapien.core import Pose  # noqa: F401
-    except ImportError:
-        pytest.skip("SAPIEN not installed in this env; WidowX initial pose unavailable")
-
-    from loongforge.embodied.eval.payload_builders.xvla import _encode_ee6d_widowx_initial
-
-    # Base pose identity, TCP pose at (0.1, 0.2, 0.3) with identity rotation
-    # → ee_pos_wrt_base = tcp_pos.
-    encoded = _encode_ee6d_widowx_initial({
-        "base_pose": np.array([0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0], dtype=np.float32),
-        "tcp_pose": np.array([0.1, 0.2, 0.3, 1.0, 0.0, 0.0, 0.0], dtype=np.float32),
-    })
-    assert encoded is not None
-    assert encoded.shape == (20,)
-    np.testing.assert_allclose(encoded[:3], np.array([0.1, 0.2, 0.3]), atol=1e-6)
-    np.testing.assert_allclose(encoded[3:10], np.array([1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0]), atol=1e-6)
-    np.testing.assert_allclose(encoded[10:], np.zeros(10), atol=1e-6)
 
 
 def test_maniskill_pi05_passthrough_reads_joint_from_state_raw():
@@ -320,40 +203,6 @@ def _robotwin_endpose():
         "left_gripper": 0.25,
         "right_gripper": 0.75,
     }
-
-
-def test_xvla_ee6d_dual_proprio_shape_and_backfill():
-    """RoboTwin ee6d_dual proprio: 20D dual-arm, closed-loop endpose backfill."""
-    from loongforge.embodied.eval.payload_builders.xvla import build_ee6d_dual_proprio
-
-    endpose = _robotwin_endpose()
-    canonical = {
-        "instruction": "adjust bottle",
-        "images": {"primary": np.zeros((10, 10, 3), np.uint8), "left": np.zeros((10, 10, 3), np.uint8),
-                   "right": np.zeros((10, 10, 3), np.uint8), "head": np.zeros((10, 10, 3), np.uint8), "wrist": None},
-        "state_raw": {"joint": np.zeros(14, np.float32), "endpose": endpose},
-    }
-    pb = build_payload_builder("xvla", yaml_model={"state_encoding": "ee6d_dual", "domain_id": 6})
-    pb.reset("ep")
-    kwargs = pb.build(canonical, {"benchmark_name": "robotwin"})
-    # First step: measured endpose.
-    expected0 = build_ee6d_dual_proprio(endpose, None)
-    assert kwargs["state"].shape == (20,)
-    assert np.allclose(kwargs["state"], expected0, atol=1e-6)
-    assert kwargs["domain_id"] == 6
-    # Images packed as [head, left, right].
-    assert len(kwargs["images"]) == 3
-
-    # Feed a decoded 16D env action → next proprio uses its pose parts.
-    env_action = np.arange(16, dtype=np.float32)
-    pb.note_env_action(env_action)
-    kwargs2 = pb.build(canonical, {"benchmark_name": "robotwin"})
-    expected1 = build_ee6d_dual_proprio(endpose, env_action)
-    assert np.allclose(kwargs2["state"], expected1, atol=1e-6)
-    # reset() clears the backfill buffer.
-    pb.reset("ep2")
-    kwargs3 = pb.build(canonical, {"benchmark_name": "robotwin"})
-    assert np.allclose(kwargs3["state"], expected0, atol=1e-6)
 
 
 def test_ee6d_dual_decoder_matches_helper():

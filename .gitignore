@@ -103,3 +103,6 @@ nsight_*/
 
 # Local AI coding assistant rules
 /.comate/
+
+# pi05 调试台运行时产物（jobs 快照/日志，体积大且无版本价值）
+debug_web_pi05/runtime/
