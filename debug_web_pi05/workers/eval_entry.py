@@ -6,7 +6,8 @@ position(3) + robosuite quaternion-to-axis-angle(3) + finger positions(2).
 This process-local adapter follows the existing launch_libero_eval_stateful.py.
 """
 from __future__ import annotations
-import argparse, errno, hashlib, json, os, runpy, shutil, signal, struct, subprocess, sys, tempfile
+import argparse, errno, hashlib, json, os, runpy, shutil, signal, struct, subprocess, sys, tempfile, threading, time
+from urllib.request import build_opener, ProxyHandler
 from pathlib import Path
 
 
@@ -56,6 +57,7 @@ def prepare_checkpoint(config, python, pin_dir):
 def main():
     parser=argparse.ArgumentParser(); parser.add_argument('--config',required=True); parser.add_argument('--train-python',required=True)
     args=parser.parse_args(); path=Path(args.config); config=json.loads(path.read_text())
+    print('[startup] 正在准备 checkpoint，随后构建 PI05、加载权重并预热 GPU；此过程可能耗时数分钟。',flush=True)
     def stop(signum, frame): raise KeyboardInterrupt(f'signal {signum}')
     signal.signal(signal.SIGINT,stop); signal.signal(signal.SIGTERM,stop)
     runtime=Path(os.environ.get('PI05_CONSOLE_RUNTIME',Path(__file__).resolve().parents[1]/'runtime'))
@@ -72,6 +74,25 @@ def main():
         print('[PI05] q99 state prompt enabled: position(3)+axis-angle(3)+finger positions(2)',flush=True)
         # The native orchestrator owns its policy-server group and cleans it in finally.
         sys.argv=['run','--config',str(resolved)]
-        runpy.run_module('loongforge.embodied.eval.orchestrator.run',run_name='__main__')
+        finished=threading.Event()
+        def startup_progress():
+            started=time.monotonic()
+            opener=build_opener(ProxyHandler({}))
+            url=f"http://127.0.0.1:{config['server']['health_port']}/healthz"
+            while not finished.wait(30):
+                try:
+                    with opener.open(url,timeout=2) as response:
+                        ready=json.load(response).get('ready')
+                    if ready:
+                        print('[startup] 策略服务就绪，开始 LIBERO 评测。',flush=True)
+                        return
+                except Exception:
+                    pass
+                print(f'[startup] 等待策略服务就绪：{int(time.monotonic()-started)} 秒。模型构建、权重加载及预热可能耗时数分钟；其他模型的可选依赖警告不表示 PI05 失败。',flush=True)
+        threading.Thread(target=startup_progress,daemon=True).start()
+        try:
+            runpy.run_module('loongforge.embodied.eval.orchestrator.run',run_name='__main__')
+        finally:
+            finished.set()
 
 if __name__=='__main__': main()

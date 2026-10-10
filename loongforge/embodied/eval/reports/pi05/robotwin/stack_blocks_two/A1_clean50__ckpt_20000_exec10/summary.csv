@@ -1,0 +1,2 @@
+benchmark,task_suite,task_id,n_episodes,successes,success_rate,success_stderr,success_ci95_low,success_ci95_high,avg_steps,avg_inference_latency_ms,avg_e2e_latency_ms,failure_reasons
+robotwin,stack_blocks_two,0,26,1,0.038461538461538464,0.037714641372727696,0.0068218089769898765,0.18893176991958405,400.0,,,not_successful:25

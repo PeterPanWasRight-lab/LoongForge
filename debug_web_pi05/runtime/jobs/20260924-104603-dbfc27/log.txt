@@ -1,0 +1,43 @@
+[startup] 正在准备 checkpoint，随后构建 PI05、加载权重并预热 GPU；此过程可能耗时数分钟。
+[checkpoint] pinned for this evaluation: /home/gm/data/LoongForge/outputs/pi05_s3_bigbatch/S3/ckpt_6000/model.safetensors
+[PI05] q99 state prompt enabled: position(3)+axis-angle(3)+finger positions(2)
+[startup] 等待策略服务就绪：30 秒。模型构建、权重加载及预热可能耗时数分钟；其他模型的可选依赖警告不表示 PI05 失败。
+[startup] 等待策略服务就绪：60 秒。模型构建、权重加载及预热可能耗时数分钟；其他模型的可选依赖警告不表示 PI05 失败。
+[startup] 等待策略服务就绪：90 秒。模型构建、权重加载及预热可能耗时数分钟；其他模型的可选依赖警告不表示 PI05 失败。
+[startup] 等待策略服务就绪：120 秒。模型构建、权重加载及预热可能耗时数分钟；其他模型的可选依赖警告不表示 PI05 失败。
+[startup] 等待策略服务就绪：150 秒。模型构建、权重加载及预热可能耗时数分钟；其他模型的可选依赖警告不表示 PI05 失败。
+[startup] 等待策略服务就绪：180 秒。模型构建、权重加载及预热可能耗时数分钟；其他模型的可选依赖警告不表示 PI05 失败。
+[startup] 等待策略服务就绪：210 秒。模型构建、权重加载及预热可能耗时数分钟；其他模型的可选依赖警告不表示 PI05 失败。
+[startup] 等待策略服务就绪：240 秒。模型构建、权重加载及预热可能耗时数分钟；其他模型的可选依赖警告不表示 PI05 失败。
+[startup] 等待策略服务就绪：270 秒。模型构建、权重加载及预热可能耗时数分钟；其他模型的可选依赖警告不表示 PI05 失败。
+[startup] 等待策略服务就绪：300 秒。模型构建、权重加载及预热可能耗时数分钟；其他模型的可选依赖警告不表示 PI05 失败。
+[startup] 等待策略服务就绪：330 秒。模型构建、权重加载及预热可能耗时数分钟；其他模型的可选依赖警告不表示 PI05 失败。
+[startup] 等待策略服务就绪：360 秒。模型构建、权重加载及预热可能耗时数分钟；其他模型的可选依赖警告不表示 PI05 失败。
+[startup] 等待策略服务就绪：390 秒。模型构建、权重加载及预热可能耗时数分钟；其他模型的可选依赖警告不表示 PI05 失败。
+[startup] 等待策略服务就绪：420 秒。模型构建、权重加载及预热可能耗时数分钟；其他模型的可选依赖警告不表示 PI05 失败。
+[startup] 等待策略服务就绪：450 秒。模型构建、权重加载及预热可能耗时数分钟；其他模型的可选依赖警告不表示 PI05 失败。
+[startup] 等待策略服务就绪：480 秒。模型构建、权重加载及预热可能耗时数分钟；其他模型的可选依赖警告不表示 PI05 失败。
+[startup] 等待策略服务就绪：510 秒。模型构建、权重加载及预热可能耗时数分钟；其他模型的可选依赖警告不表示 PI05 失败。
+[info] using task orders [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+[robosuite WARNING] No private macro file found! (__init__.py:7)
+WARNING:robosuite_logs:No private macro file found!
+[robosuite WARNING] It is recommended to use a private macro file (__init__.py:8)
+WARNING:robosuite_logs:It is recommended to use a private macro file
+[robosuite WARNING] To setup, run: python /home/gm/.conda/envs/wh/lib/python3.10/site-packages/robosuite/scripts/setup_macros.py (__init__.py:9)
+WARNING:robosuite_logs:To setup, run: python /home/gm/.conda/envs/wh/lib/python3.10/site-packages/robosuite/scripts/setup_macros.py
+[startup] 策略服务就绪，开始 LIBERO 评测。
+{"benchmark": "libero", "task_suite": "libero_10", "task_id": 0, "task": "put both the alphabet soup and the tomato sauce in the basket", "seed": 7, "episode_idx": 0, "episode_id": "libero/libero_10/task=0/episode=0", "runtime": "sim", "success": 0, "steps": 520, "safety_cost": null, "episode_time_sec": 64.08751320838928, "reset_time_sec": 2.5183510780334473, "incidents": [], "model_name": "pi05-console", "checkpoint": "/home/gm/data/LoongForge/LoongForge/debug_web_pi05/runtime/pinned/eval-nz_orpa8", "robot_setup": "franka", "control_hz": 20, "avg_inference_latency_ms": 503.68521015413785, "avg_e2e_latency_ms": 13.9252516552985, "failure_reason": "not_successful_within_max_steps", "replay_path": "/home/gm/data/LoongForge/outputs/pi05_web_eval_20260924024547/artifacts/libero_10/task0/episode0/replay_fail.gif", "trace_path": null, "server_metadata": {"protocol_version": "1.0", "action_dim": 7, "action_unnormalization": "model_predict_action", "supports_preempt": false, "framework": "loongforge", "model_type": "pi05", "ckpt_path": "/home/gm/data/LoongForge/LoongForge/debug_web_pi05/runtime/pinned/eval-nz_orpa8", "random_init": false, "loongforge_root": "", "action_horizon": 50, "dataset_statistics_path": "/home/gm/data/LoongForge/artifacts/libero_full/meta/stats.json", "tokenizer_path": "/home/gm/data/LoongForge/artifacts/paligemma-3b-pt-224"}, "repro": {"git_sha": null, "benchmark_commit": null, "docker_image": null, "python_env_hash": null, "global_seed": 7, "episode_seed": 7, "protocol_version": "1.0", "inference_config": {}}, "attempt": 0}
+{
+  "benchmark": "libero",
+  "task_suite": "libero_10",
+  "n_records": 1,
+  "new_records": 1,
+  "success_rate": 0.0,
+  "results_path": "/home/gm/data/LoongForge/outputs/pi05_web_eval_20260924024547/results.jsonl",
+  "summary_path": "/home/gm/data/LoongForge/outputs/pi05_web_eval_20260924024547/summary.csv",
+  "suite_summary_path": "/home/gm/data/LoongForge/outputs/pi05_web_eval_20260924024547/suite_summary.csv",
+  "report": null,
+  "elapsed_sec": 64.10436034202576
+}
+{"t": "exit", "code": 0}
+[launcher] exited with code 0 (succeeded)

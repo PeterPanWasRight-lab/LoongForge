@@ -1,0 +1,180 @@
+{
+  "ok": true,
+  "checks": [
+    {
+      "name": "LoongForge 入口",
+      "level": "ok",
+      "detail": "/home/gm/data/LoongForge/LoongForge"
+    },
+    {
+      "name": "训练/策略解释器",
+      "level": "ok",
+      "detail": "/home/gm/data/LoongForge/env/bin/python"
+    },
+    {
+      "name": "Tokenizer",
+      "level": "ok",
+      "detail": "/home/gm/data/LoongForge/artifacts/paligemma-3b-pt-224"
+    },
+    {
+      "name": "LeRobot 数据集",
+      "level": "ok",
+      "detail": "/home/gm/data/LoongForge/artifacts/libero_10 · 格式 v3.0"
+    },
+    {
+      "name": "动作与状态维度",
+      "level": "ok",
+      "detail": "action=7 / state=8，最大填充维度32"
+    },
+    {
+      "name": "相机",
+      "level": "ok",
+      "detail": "2 路：observation.images.image, observation.images.wrist_image；当前配方使用双相机"
+    },
+    {
+      "name": "PI05 q99 统计",
+      "level": "ok",
+      "detail": "动作反归一化和 state 离散化均使用数据集 q01/q99"
+    },
+    {
+      "name": "PI05 模型来源",
+      "level": "ok",
+      "detail": "/home/gm/data/LoongForge/artifacts/pi05_libero_v044"
+    },
+    {
+      "name": "权重文件",
+      "level": "ok",
+      "detail": "812 tensors · wrapped（仅检查文件头）"
+    },
+    {
+      "name": "评测权重适配",
+      "level": "warn",
+      "detail": "原生训练权重存在包装前缀：启动时转换到独立缓存，保留原权重"
+    },
+    {
+      "name": "独立输出目录",
+      "level": "ok",
+      "detail": "/home/gm/data/LoongForge/outputs/pi05v044testLibero_10（不覆盖已有结果）"
+    },
+    {
+      "name": "LIBERO 解释器",
+      "level": "ok",
+      "detail": "/home/gm/.conda/envs/wh/bin/python"
+    },
+    {
+      "name": "LIBERO 环境配置",
+      "level": "ok",
+      "detail": "/home/gm/.libero"
+    },
+    {
+      "name": "LIBERO 数据语义",
+      "level": "ok",
+      "detail": "当前支持 LIBERO：7维末端动作、8维状态（位置+轴角+双指位置）"
+    },
+    {
+      "name": "PI05 推理口径",
+      "level": "ok",
+      "detail": "q99 反归一化 / state 注入语言提示 / FP32 / 执行 10 帧后重规划"
+    },
+    {
+      "name": "评测规模",
+      "level": "ok",
+      "detail": "3任务 × 1次 = 3 episodes；当前成功率只统计已完成样本"
+    }
+  ],
+  "kind": "eval",
+  "argv": [
+    "/home/gm/.conda/envs/wh/bin/python",
+    "/home/gm/data/LoongForge/LoongForge/debug_web_pi05/workers/eval_entry.py",
+    "--config",
+    "/home/gm/data/LoongForge/outputs/pi05v044testLibero_10/console_eval.json",
+    "--train-python",
+    "/home/gm/data/LoongForge/env/bin/python"
+  ],
+  "env": {
+    "MODEL_NAME": "pi05",
+    "CUDA_VISIBLE_DEVICES": "0",
+    "PYTHONPATH": "/home/gm/data/LoongForge/LoongForge:/home/gm/data/LoongForge/bench_env/site-packages",
+    "PATH": "/home/gm/data/LoongForge/env/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin",
+    "LOONGFORGE_PATH": "/home/gm/data/LoongForge/LoongForge",
+    "TOKENIZER_PATH": "/home/gm/data/LoongForge/artifacts/paligemma-3b-pt-224",
+    "NO_PROXY": "127.0.0.1,localhost",
+    "no_proxy": "127.0.0.1,localhost",
+    "MUJOCO_GL": "egl",
+    "PYOPENGL_PLATFORM": "egl",
+    "LIBERO_CONFIG_PATH": "/home/gm/.libero"
+  },
+  "cwd": "/home/gm/data/LoongForge/LoongForge",
+  "output": "/home/gm/data/LoongForge/outputs/pi05v044testLibero_10",
+  "config": {
+    "benchmark": {
+      "name": "libero",
+      "suite": "libero_10",
+      "max_tasks": 3,
+      "episodes_per_task": 1,
+      "max_steps": 520,
+      "num_steps_wait": 10,
+      "continuous_gripper": true,
+      "prefer_controller_ee": false
+    },
+    "model": {
+      "backend": "loongforge",
+      "model_type": "pi05",
+      "name": "pi05-console",
+      "action_dim": 7,
+      "state_dim": 8,
+      "action_horizon": 50,
+      "max_action_dim": 32,
+      "max_state_dim": 32,
+      "compile_model": false,
+      "state_encoding": "lib_eef_axis_angle"
+    },
+    "server": {
+      "host": "127.0.0.1",
+      "port": 39981,
+      "health_port": 57081,
+      "python": "/home/gm/data/LoongForge/env/bin/python",
+      "log": "/home/gm/data/LoongForge/outputs/pi05v044testLibero_10/policy_server.log",
+      "start_timeout_sec": 1800,
+      "ckpt_path": "/home/gm/data/LoongForge/artifacts/pi05_libero_v044",
+      "dataset_statistics_path": "/home/gm/data/LoongForge/artifacts/libero_10/meta/stats.json",
+      "tokenizer_path": "/home/gm/data/LoongForge/artifacts/paligemma-3b-pt-224",
+      "use_bf16": false,
+      "chunk_execute_steps": 10
+    },
+    "env": {
+      "eval_root": "/home/gm/data/LoongForge/LoongForge/loongforge/embodied/eval",
+      "loongforge_root": "/home/gm/data/LoongForge/LoongForge",
+      "libero_config_path": "/home/gm/.libero",
+      "mujoco_gl": "egl",
+      "pyopengl_platform": "egl"
+    },
+    "run": {
+      "output_dir": "/home/gm/data/LoongForge/outputs/pi05v044testLibero_10",
+      "timestamped_output": false,
+      "seed": 7,
+      "save_trace": false,
+      "save_replay": true
+    },
+    "timeouts": {
+      "policy_call_ms": 600000,
+      "per_step_sec": 600,
+      "per_episode_sec": 1800
+    }
+  },
+  "params": {
+    "checkpoint": "/home/gm/data/LoongForge/artifacts/pi05_libero_v044",
+    "dataset": "/home/gm/data/LoongForge/artifacts/libero_10",
+    "output": "/home/gm/data/LoongForge/outputs/pi05v044testLibero_10",
+    "gpus": "0",
+    "tasks": 3,
+    "episodes": 1,
+    "max_steps": 520,
+    "horizon": 50,
+    "execute_steps": 10,
+    "seed": 7,
+    "save_video": true
+  },
+  "cmdline": "/home/gm/.conda/envs/wh/bin/python /home/gm/data/LoongForge/LoongForge/debug_web_pi05/workers/eval_entry.py --config /home/gm/data/LoongForge/outputs/pi05v044testLibero_10/console_eval.json --train-python /home/gm/data/LoongForge/env/bin/python",
+  "notes": "静态检查不验证显存是否足够或所有第三方库；启动后查看实时日志。"
+}

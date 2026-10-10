@@ -1,0 +1,35 @@
+{
+  "id": "20260924-102318-96a194",
+  "kind": "eval",
+  "title": "PI05 LIBERO评测 · pi05v044testLibero_10",
+  "argv": [
+    "/home/gm/data/LoongForge/env/bin/python",
+    "/home/gm/data/LoongForge/LoongForge/debug_web_pi05/workers/runner.py",
+    "/home/gm/data/LoongForge/LoongForge/debug_web_pi05/runtime/jobs/20260924-102318-96a194/launch.json"
+  ],
+  "cmdline": "/home/gm/data/LoongForge/env/bin/python /home/gm/data/LoongForge/LoongForge/debug_web_pi05/workers/runner.py /home/gm/data/LoongForge/LoongForge/debug_web_pi05/runtime/jobs/20260924-102318-96a194/launch.json",
+  "cwd": "/home/gm/data/LoongForge/LoongForge",
+  "params": {
+    "checkpoint": "/home/gm/data/LoongForge/artifacts/pi05_libero_v044",
+    "dataset": "/home/gm/data/LoongForge/artifacts/libero_10",
+    "output": "/home/gm/data/LoongForge/outputs/pi05v044testLibero_10",
+    "gpus": "0",
+    "tasks": 3,
+    "episodes": 1,
+    "max_steps": 520,
+    "horizon": 50,
+    "execute_steps": 10,
+    "seed": 7,
+    "save_video": true
+  },
+  "cams": [],
+  "status": "succeeded",
+  "returncode": 0,
+  "error": null,
+  "created_at": 1790216598.4234855,
+  "started_at": 1790216598.4260979,
+  "ended_at": 1790217296.2156646,
+  "metrics": {},
+  "summary": {},
+  "pid": 4138481
+}
