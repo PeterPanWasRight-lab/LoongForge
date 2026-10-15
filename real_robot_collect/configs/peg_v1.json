@@ -1,0 +1,100 @@
+{
+  "_comment": "独立采集配置（HS 臂 · 插板入槽）。字段含义见 real_robot_collect/config.py。上传前务必核对 robot.ip（历史出现过 3 个值）。",
+  "_baseline": "数值取自 102.56 上正在用的 src/lerobot/experiments/record.json，但 schema 是新的（不再有 env/processor/mode 那套 RL 结构）。",
+  "_safety_20261013": "按现场实测位姿 [609.402, 235.353, -15.25, 157.778, -0.683, -179.303] 重设：workspace_limits 改为中心 ±100mm（旧值 x_max 550 / y∈[-150,60] / z_min 18 与现场不符，复位会被 clip 后 1 秒内冲 187mm）；reset_gripper 改 1.0（旧值 0.0 走 OPEN 分支，每条开头张开夹爪、板卡会掉）。",
+
+  "robot": {
+    "type": "hs_robot",
+    "ip": "10.10.59.211",
+    "port": 23234,
+    "control_mode": 0,
+    "gripper_io_port": 19,
+    "enable_on_connect": true,
+    "workspace_limits": {
+      "x_min": 509.0,
+      "x_max": 710.0,
+      "y_min": 135.0,
+      "y_max": 336.0,
+      "z_min": -116.0,
+      "z_max": 85.0,
+      "rx_min": -180.0,
+      "rx_max": 180.0,
+      "ry_min": -180.0,
+      "ry_max": 180.0,
+      "rz_min": -180.0,
+      "rz_max": 180.0
+    },
+    "cameras": {
+      "front": {
+        "type": "intelrealsense",
+        "serial_number_or_name": "336222070541",
+        "width": 640,
+        "height": 480,
+        "fps": 60
+      },
+      "wrist": {
+        "type": "intelrealsense",
+        "serial_number_or_name": "833612070569",
+        "width": 640,
+        "height": 480,
+        "fps": 60
+      }
+    }
+  },
+
+  "spacemouse": {
+    "enabled": true,
+    "deadzone": 0.01,
+    "rotation_deadzone": 0.04,
+    "filter_alpha": 0.5,
+    "position_scale": 1200.0,
+    "rotation_scale": 0.0,
+    "max_position_offset": 30.0,
+    "max_rotation_offset": 30.0,
+    "update_rate_hz": 500.0,
+    "max_angle_delta_deg": 10.0,
+    "use_gripper": false,
+    "button0_mode": "translate",
+    "button1_mode": "rotate",
+    "emergency_buttons": [0, 1],
+    "emergency_hold_time": 1.0,
+    "output_mode": "incremental",
+    "axis_mapping": [1, 0, 2, 5, 3, 4],
+    "axis_inversion": [-1, 1, 1, -1, 1, 1]
+  },
+
+  "keyboard": {
+    "enabled": true,
+    "type": "keyboard_ee",
+    "step_size": 2.5,
+    "use_gripper": false
+  },
+
+  "record": {
+    "fps": 10,
+    "image_size": 224,
+    "use_videos": false,
+    "control_time_s": 25.0,
+    "reset_time_s": 1.5,
+    "reset_position": [609.402, 235.353, -15.25, 157.778, -0.683, -179.303],
+    "reset_gripper": 1.0,
+    "crop_params": {
+      "front": [150, 250, 250, 250],
+      "wrist": [100, 200, 350, 350]
+    },
+    "include_gripper": false,
+    "collect_force_torque": false,
+    "image_writer_threads": 4,
+    "keep_failed": false,
+    "display": false
+  },
+
+  "dataset": {
+    "repo_id": "hs_robot_peg_v1",
+    "root": "/home/gm/Project/Test/lerobot_test/datasets",
+    "task": "insert the board into the slot",
+    "num_episodes": 50,
+    "robot_type": "hs_robot",
+    "timestamp_suffix": true
+  }
+}

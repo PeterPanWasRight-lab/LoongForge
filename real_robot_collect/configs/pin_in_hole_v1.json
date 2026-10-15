@@ -1,0 +1,103 @@
+{
+  "_comment": "独立采集配置（HS 臂 · pin in hole 插销入孔）。由 peg_v1.json 派生（2026-10-15 任务切换）。字段含义见 real_robot_collect/config.py。",
+  "_reset_confirmed": "✅ 2026-10-15 用户确认：[445.326, -70.015, 74.987, 154.751, -0.002, 179.845] **就是 pin in hole 的实验起始位**（非占位）。workspace_limits 由它平移 ±100mm 推出。采集前仍建议跑一次 `rrc calibrate` 只读核对（差值应为 0）——若现场微调过起始位，用 `--apply` 覆盖。",
+  "_inherited_from_peg_v1": "fps=10 / include_gripper=false(state 12, action 3) / collect_force_torque=false(力 6 维恒 0) / position_scale=1200 / 相机序列号均沿用 peg_v1，未重新验证。",
+  "_camera_status_20261015": "⚠️ 前置（全局）相机 09:18 快照显示**尚未对准该工位**（画面里没有机械臂，看到的是工作台+主板+椅子）⇒ 现场调整朝向。腕部相机「基本好了」。",
+  "_crop_note": "crop_params=(top,left,h,w)：front [50,150,390,340]（覆盖夹爪行程+网口板全部网口，用户 10-15 确认）、wrist [160,180,320,320]。依据 10-15 09:38 快照划定；**相机位姿定死的前提下方可沿用**。",
+  "_camera_lock": "🚨 相机物理位姿一旦定死，采集 / 训练 / 推理全程**不得再动** —— 视觉输入分布一致是训练/执行对齐的前提（端到端学的是像素，外参漂移无补偿）。",
+
+  "robot": {
+    "type": "hs_robot",
+    "ip": "10.10.59.211",
+    "port": 23234,
+    "control_mode": 0,
+    "gripper_io_port": 19,
+    "enable_on_connect": true,
+    "workspace_limits": {
+      "x_min": 345.0,
+      "x_max": 546.0,
+      "y_min": -171.0,
+      "y_max": 31.0,
+      "z_min": -26.0,
+      "z_max": 176.0,
+      "rx_min": -180.0,
+      "rx_max": 180.0,
+      "ry_min": -180.0,
+      "ry_max": 180.0,
+      "rz_min": -180.0,
+      "rz_max": 180.0
+    },
+    "cameras": {
+      "front": {
+        "type": "intelrealsense",
+        "serial_number_or_name": "336222070541",
+        "width": 640,
+        "height": 480,
+        "fps": 60
+      },
+      "wrist": {
+        "type": "intelrealsense",
+        "serial_number_or_name": "833612070569",
+        "width": 640,
+        "height": 480,
+        "fps": 60
+      }
+    }
+  },
+
+  "spacemouse": {
+    "enabled": true,
+    "deadzone": 0.01,
+    "rotation_deadzone": 0.04,
+    "filter_alpha": 0.5,
+    "position_scale": 1200.0,
+    "rotation_scale": 0.0,
+    "max_position_offset": 30.0,
+    "max_rotation_offset": 30.0,
+    "update_rate_hz": 500.0,
+    "max_angle_delta_deg": 10.0,
+    "use_gripper": false,
+    "button0_mode": "translate",
+    "button1_mode": "rotate",
+    "emergency_buttons": [0, 1],
+    "emergency_hold_time": 1.0,
+    "output_mode": "incremental",
+    "axis_mapping": [1, 0, 2, 5, 3, 4],
+    "axis_inversion": [-1, 1, 1, -1, 1, 1]
+  },
+
+  "keyboard": {
+    "enabled": true,
+    "type": "keyboard_ee",
+    "step_size": 2.5,
+    "use_gripper": false
+  },
+
+  "record": {
+    "fps": 10,
+    "image_size": 224,
+    "use_videos": false,
+    "control_time_s": 25.0,
+    "reset_time_s": 1.5,
+    "reset_position": [445.326, -70.015, 74.987, 154.751, -0.002, 179.845],
+    "reset_gripper": 1.0,
+    "crop_params": {
+      "front": [50, 150, 390, 340],
+      "wrist": [160, 180, 320, 320]
+    },
+    "include_gripper": false,
+    "collect_force_torque": false,
+    "image_writer_threads": 4,
+    "keep_failed": false,
+    "display": false
+  },
+
+  "dataset": {
+    "repo_id": "hs_robot_pin_in_hole_v1",
+    "root": "/home/gm/Project/Test/lerobot_test/datasets",
+    "task": "insert the pin into the hole",
+    "num_episodes": 50,
+    "robot_type": "hs_robot",
+    "timestamp_suffix": true
+  }
+}
